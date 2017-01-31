@@ -112,7 +112,8 @@
 }
 {
   type: REMOVE_REPLY,
-  replyId
+  replyId,
+  sunnyId,
 }
 
 
@@ -122,7 +123,7 @@
 }
 {
   type: FETCHING_COUNT_ERROR,
-  error: 'Error fetching sunny\'s like count'
+  error: 'Error fetching sunny like count'
 }
 {
   type: FETCHING_COUNT_SUCCESS,

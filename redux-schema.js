@@ -34,7 +34,7 @@
     error,
     [userId]:{
       lastUpdated,
-      sunnyIds: [ [sunnyId], [sunnyId]]
+      sunnyIds: [ [sunnyId], [sunnyId] ]
     }
   },
   likeCount: {
@@ -47,20 +47,21 @@
     isFetching,
     error,
     [sunnyId]: {
+      lastUpdated,
       replies: {
-        lastUpdated,
         [replyId]: {
           name,
-          comment,
+          reply,
           userId,
           timestamp,
-          avatar
+          avatar,
+          replyId
         }
       }
     }
   },
   listeners: {
-    [listenersId]: true
+    [listenerId]: true
   },
   feed: {
     isFetching,

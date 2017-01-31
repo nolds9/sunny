@@ -38,7 +38,7 @@ Replies
   sunnyId
     replyId
       name
-      comment
+      reply
       userId
       timestamp
       avatar

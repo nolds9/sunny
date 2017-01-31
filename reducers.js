@@ -58,7 +58,7 @@ function users (state = initialUsersState, action) {
       }
 
     case FETCHING_USER_SUCCESS :
-      return action.user === null
+      return action.user === null // guest user
       ? {
         ...state,
         error: '',
@@ -76,13 +76,13 @@ function users (state = initialUsersState, action) {
   } // ends switch
 } // ends users func
 
-
-const initialSunnysState = {
+// Sunnys
+const initialSunnyState = {
   isFetching: true,
   error: '',
 }
 
-function sunnys (state = initialSunnysState, action ) {
+function sunnys (state = initialSunnyState, action ) {
   switch(action.type) {
     case FETCHING_SUNNY :
       return {
@@ -126,9 +126,10 @@ function sunnys (state = initialSunnysState, action ) {
   } // ends switch
 } // ends sunnys func
 
+// feed
 function feed (state, action) {
   switch (action.type) {
-    case SETTING_FEED_LISTENER :
+    case SETTING_FEED_LISTENER :  // when is this called?
      return {
        ...state,
        isFetching: true
@@ -144,8 +145,283 @@ function feed (state, action) {
        ...state,
        isFetching: true,
        error: '',
-       sunnyIds: actions.sunnyIds,
-       newSunnysAvailable: false
+       sunnyIds: actions.sunnyIds, // what do we do with these?
+       newSunnyAvailable: false // shouldn't this be true?
      }
+  }
+}
+
+// listeners
+export default function listeners ( state = {}, action = {} ) {
+  switch (action.type) {
+    case ADD_LISTENER :
+      return {
+        ...state,
+        [action.listenerId]: true,
+      }
+    default :
+      return state
+  }
+}
+
+// Modal
+const initialState = {
+  isOpen: false,
+  newSunnyText: ''
+}
+
+export default function modal ( state = initialState, action = {} ) {
+  switch (action.type) {
+    case OPEN_MODAL :
+      return {
+        ...state,
+        isOpen: true,
+      }
+    case CLOSE_MODAL :
+      return {
+        ...state,
+        isOpen: false,
+        newSunnyText: '',
+      }
+    case UPDATE_SUNNY_TEXT :
+      return {
+        ...state,
+        newSunnyText: action.newSunnyText,
+      }
+    default:
+      return state
+  }
+}
+
+const initialUsersSunnyState = {
+  sunnyIds: [],
+  lastUpdated: 0,
+}
+
+function usersSunny (state = initialUsersSunnyState, action) {
+  switch (action.type) {
+    case ADD_SINGLE_USER_SUNNY :
+      return {
+        ...state,
+        sunnyIds: [...state.sunnyIds, action.sunnyId]
+      }
+    default:
+      return state
+  }
+}
+
+const initialState = {
+  isFetching: false,
+  error: '',
+}
+
+// user_sunnys
+export function usersSunnys ( state = initialState, action = {} ) {
+  switch (action.type) {
+    case FETCHING_USER_SUNNYS :
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case FETCHING_USER_SUNNYS_ERROR :
+      return {
+        ...state,
+        isFetching: false,
+        error: action.error,
+      }
+    case FETCHING_USER_SUNNYS_SUCCESS :
+      return {
+        ...state,
+        ...initialState,
+        [action.sunnyId]: {
+          lastUpdated: action.lastUpdated,
+          sunnyIds: action.sunnyIds,
+        },
+      }
+    case ADD_SINGLE_USER_SUNNY :
+      return typeof state[action.uid] === 'undefined'
+        ? state
+        : {
+          ...state,
+          ...initialState,
+          [action.uid]: usersSunny(state[action.uid], action),
+        }
+    default:
+      return state
+  }
+}
+
+// userslikes
+const initialState = {
+  isFetching: false,
+  error: '',
+}
+
+export default function usersLikes (state = initialState, action = {}) {
+  switch (action.type) {
+    case FETCHING_LIKES :
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case FETCHING_LIKES_ERROR :
+      return {
+        ...state,
+        isFetching: false,
+        error: action.error,
+      }
+    case FETCHING_USER_SUNNYS_SUCCESS :
+      return {
+        ...state,
+        isFetching: false,
+        ...action.likes,
+        error: '',
+      }
+    case ADD_LIKE :
+      return {
+        ...state,
+        [action.sunnyId]: true,
+      }
+    case REMOVE_LIKE :
+      return Object.keys(state) // state,sunnyIds ?
+        .filter(sunnyId => action.sunnyId !== sunnyId)
+        .reduce((acc, curr) => {
+          acc[curr] = state[curr]
+          return acc
+        }, {})
+    default:
+      return state
+  }
+}
+
+// likescount
+function count (state, action) {
+  switch (action.type) {
+    case ADD_LIKE :
+      return state + 1
+    case REMOVE_LIKE :
+      return state - 1
+    default:
+      return state
+  }
+}
+
+
+const initialState = {
+  isFetching: false,
+  error: ''
+}
+
+export default function likeCount (state = initialState, action = {}) {
+  switch (action.type) {
+    case FETCHING_COUNT :
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case FETCHING_COUNT_ERROR :
+      return {
+        ...state,
+        isFetching: false,
+        error: action.error,
+      }
+    case FETCHING_COUNT_SUCCESS :
+      return {
+        ...state,
+        ...initialState,
+        [action.sunnyId]: action.count
+      }
+    case ADD_LIKE :
+    case REMOVE_LIKE :
+      return typeof state[action.sunnyId] === 'undefined'
+        ? state
+        : {
+          ...state,
+          [action.sunnyId]: count(state[action.sunnyId], action)
+        }
+    default:
+      return state
+  }
+}
+
+// replies
+const initialRepliesState = {
+  isFetching: false,
+  error: '',
+}
+
+const initialReplyState = {
+  lastUpdated: Date.now(),
+  replies: {},
+}
+
+const initialSunnyReplyState = {
+  name: '',
+  reply: '',
+  uid: '',
+  timestamp: 0,
+  avatar: '',
+  replyId: '',
+}
+
+function sunnyReply (state = initialSunnyReplyState, action) {
+  switch (action.type) {
+    case ADD_REPLY :
+      return {
+        ...state,
+        [action.reply.replyId]: action.reply,
+      }
+    case REMOVE_REPLY :
+      return {
+        ...state,
+        [action.reply.replyId]: undefined,
+      }
+    default:
+      return state
+  }
+}
+
+function reply (state = initialReplyState, action) {
+  switch (action.type) {
+    case FETCHING_REPLIES_SUCCESS :
+      return {
+        ...state,
+        lastUpdated: action.lastUpdated,
+        replies: action.replies,
+      }
+    case REMOVE_REPLY :
+    case NEW_REPLY :
+      return {
+        ...state,
+        replies: sunnyReply(state.replies, action)
+      }
+    default:
+      return state
+  }
+}
+
+export default function replies (state = initialRepliesState, action) {
+  switch (action.type) {
+    case FETCHING_REPLIES :
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case FETCHING_REPLIES_ERROR :
+      return {
+        ...state,
+        isFetching: false,
+        error: action.error,
+      }
+    case ADD_REPLY :
+    case REMOVE_REPLY :
+    case FETCHING_REPLIES_SUCCESS :
+      return {
+        ...state,
+        ...initialRepliesState,
+        [action.sunnyId]: reply(state[action.sunnyId], action)
+      }
+    default:
+      return state
   }
 }
