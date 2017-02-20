@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
+import React, { PropTypes } from 'react';
 import logo from '../../content/logo.svg';
 import '../../content/App.css';
 
-class App extends Component {
-  render() {
+const Home = ({ message }) => {
     return (
       <div className="App">
         <div className="App-header">
@@ -11,11 +10,14 @@ class App extends Component {
           <h2>Welcome to Always Sunny</h2>
         </div>
         <p className="App-intro">
-          Home of the finest <code>milksteaks</code> and <code>jellybeans</code> in the world.
+          {message}
         </p>
       </div>
     );
-  }
 }
 
-export default App;
+Home.propTypes = {
+  message: PropTypes.string.isRequired,
+}
+
+export default Home;

@@ -1,5 +1,7 @@
-import App from './App/App'
+import Home from './Home/Home'
+import Navigation from './Navigation/Navigation'
 
 export {
-  App
+  Home,
+  Navigation
 }

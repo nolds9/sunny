@@ -1,10 +1,16 @@
 import React, { Component } from 'react'
-import { App } from '../../components'
+import { Navigation } from '../../components'
+import { container, innerContainer } from './styles'
 
 class Main extends Component {
   render(){
     return (
-      <App />
+      <div style={container}>
+        <Navigation isAuthed={true} />
+        <div style={innerContainer}>
+          {this.props.children}
+        </div>
+      </div>
     )
   }
 }
